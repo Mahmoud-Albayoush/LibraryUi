@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack Overflow Questions</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .questions-container {
+            display: flex;
+        }
+        .questions-list {
+            flex: 1;
+            padding-right: 20px;
+            border-right: 1px solid #ddd;
+        }
+        .question-item {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .question-item:hover {
+            background-color: #f0f0f0;
+        }
+        .question-item.selected {
+            background-color: #0073aa;
+            color: white;
+        }
+        .question-details {
+            flex: 2;
+            padding-left: 20px;
+        }
+        .question-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .question-body {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stack Overflow Questions</h1>
+
+    <div class="questions-container">
+        <div class="questions-list">
+            <h2>Latest 50 Questions</h2>
+            <div id="questionsContainer"></div>
+        </div>
+        <div class="question-details">
+            <h2>Question Details</h2>
+            <div id="questionDetails">
+                <div class="question-title"></div>
+                <div class="question-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Function to load questions
+            function loadQuestions() {
+                $.ajax({
+                    url: 'https://api.stackexchange.com/2.3/questions?order=desc&sort=activity&site=stackoverflow&pagesize=50',
+                    method: 'GET',
+                    success: function(data) {
+                        var questions = data.items;
+                        var questionsContainer = $('#questionsContainer');
+                        questions.forEach(function(question) {
+                            var questionElement = $('<div class="question-item" data-question-id="' + question.question_id + '">' + question.title + '</div>');
+                            questionsContainer.append(questionElement);
+                        });
+
+                        // Handle click on question item
+                        $('.question-item').click(function() {
+                            var questionId = $(this).data('question-id');
+                            showQuestionDetails(questionId);
+                            $('.question-item').removeClass('selected');
+                            $(this).addClass('selected');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching questions:', error);
+                    }
+                });
+            }
+
+            // Function to show question details
+            function showQuestionDetails(questionId) {
+                $.ajax({
+                    url: 'https://api.stackexchange.com/2.3/questions/' + questionId + '?order=desc&sort=activity&site=stackoverflow&filter=withbody',
+                    method: 'GET',
+                    success: function(data) {
+                        var question = data.items[0];
+                        $('.question-title').text(question.title);
+                        $('.question-body').html(question.body);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching question details:', error);
+                    }
+                });
+            }
+
+            // Load questions when page loads
+            loadQuestions();
+        });
+    </script>
+</body>
+</html>

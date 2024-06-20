@@ -1,0 +1,13 @@
+USE [LibraryManagement]
+GO
+/****** Object:  StoredProcedure [dbo].[GetBooksWithAuthors]    Script Date: 6/21/2024 12:30:25 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[GetBooksWithAuthors]
+AS
+BEGIN
+    SELECT * FROM [dbo].[Books]
+END
